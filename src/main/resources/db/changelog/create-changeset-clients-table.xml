@@ -26,9 +26,6 @@
             <column name="balance" type="NUMERIC(16,2)">
                 <constraints nullable="false"/>
             </column>
-            <column name="group_id" type="integer">
-                <constraints nullable="false"/>
-            </column>
         </createTable>
     </changeSet>
 </databaseChangeLog>

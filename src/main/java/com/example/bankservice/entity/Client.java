@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -27,7 +27,7 @@ public class Client {
     private String middlename;
 
     @Column(name = "birth_date")
-    private LocalDate birthDate;
+    private Date birthDate;
 
     @Column(name = "balance")
     private Double balance;

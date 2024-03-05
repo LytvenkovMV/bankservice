@@ -1,16 +1,14 @@
 package com.example.bankservice.dto;
 
-import com.example.bankservice.entity.Email;
-import com.example.bankservice.entity.Phone;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.OneToMany;
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -19,23 +17,31 @@ import java.util.List;
 @ApiModel(value = "DTO для добавления клиента")
 public class AddClientRequestDto {
     @ApiModelProperty(value = "Фамилия", required = true)
+    @JsonProperty(value = "surname")
     private String surname;
 
     @ApiModelProperty(value = "Имя", required = true)
+    @JsonProperty(value = "name")
     private String name;
 
     @ApiModelProperty(value = "Отчество", required = true)
+    @JsonProperty(value = "middlename")
     private String middlename;
 
     @ApiModelProperty(value = "Дата рождения", required = true)
-    private LocalDate birthDate;
+    @JsonProperty(value = "birth_date")
+    @JsonFormat(pattern = "yyyy-mm-dd")
+    private Date birthDate;
 
     @ApiModelProperty(value = "Баланс счета", required = true)
+    @JsonProperty(value = "balance")
     private Double balance;
 
     @ApiModelProperty(value = "Список телефонов", required = true)
-    private List<String> phones;
+    @JsonProperty(value = "phones")
+    private String[] phones;
 
     @ApiModelProperty(value = "Список емайлов", required = true)
-    private List<String> emails;
+    @JsonProperty(value = "emails")
+    private String[] emails;
 }
