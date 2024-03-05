@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="create_table_emails" author="vitek">
+        <!-- Прописываем создание таблицы -->
+        <createTable tableName="emails">
+            <!--Создаем поля -->
+            <column autoIncrement="true" name="id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_id" type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="add_fk_client_id" author="vitek">
+        <!-- Прописываем внешний ключ -->
+        <addForeignKeyConstraint baseColumnNames="client_id"
+                                 baseTableName="emails"
+                                 constraintName="fk_client_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="clients"/>
+    </changeSet>
+</databaseChangeLog>
