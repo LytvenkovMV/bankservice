@@ -26,11 +26,17 @@ public class Client {
     @Column(name = "middlename")
     private String middlename;
 
+    @Column(name = "login")
+    private String login;
+
     @Column(name = "birth_date")
     private Date birthDate;
 
-    @Column(name = "balance")
-    private Double balance;
+    @Column(name = "init_balance")
+    private Double initBalance;
+
+    @Column(name = "curr_balance")
+    private Double currBalance;
 
     @OneToMany(mappedBy = "phone")
     private List<Phone> phones;

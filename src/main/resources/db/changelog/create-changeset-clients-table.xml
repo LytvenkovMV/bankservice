@@ -20,10 +20,16 @@
             <column name="middlename" type="varchar(30)">
                 <constraints nullable="false"/>
             </column>
+            <column name="login" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
             <column name="birth_date" type="DATE">
                 <constraints nullable="false"/>
             </column>
-            <column name="balance" type="NUMERIC(16,2)">
+            <column name="init_balance" type="NUMERIC(16,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="curr_balance" type="NUMERIC(16,2)">
                 <constraints nullable="false"/>
             </column>
         </createTable>

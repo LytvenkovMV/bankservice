@@ -28,6 +28,10 @@ public class AddClientRequestDto {
     @JsonProperty(value = "middlename")
     private String middlename;
 
+    @ApiModelProperty(value = "Логин", required = true)
+    @JsonProperty(value = "login")
+    private String login;
+
     @ApiModelProperty(value = "Дата рождения", required = true)
     @JsonProperty(value = "birth_date")
     @JsonFormat(pattern = "yyyy-mm-dd")

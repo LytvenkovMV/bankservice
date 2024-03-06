@@ -7,6 +7,7 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.exact;
+
 @Component
 public class ClientMatcher {
     ClientRepository clientRepository;
@@ -15,14 +16,13 @@ public class ClientMatcher {
         this.clientRepository = clientRepository;
     }
 
-    public boolean isExistsWithSurname(String surname) {
-        ExampleMatcher surnameMatcher = ExampleMatcher.matching()
-                .withIgnorePaths("id")
-                .withMatcher("surname", exact());
-
+    public boolean isExistsWithLogin(String login) {
         Client probe = new Client();
-        probe.setSurname(surname);
-        Example<Client> example = Example.of(probe, surnameMatcher);
+        probe.setLogin(login);
+        Example<Client> example = Example.of(probe,
+                ExampleMatcher.matching()
+                        .withIgnorePaths("id")
+                        .withMatcher("login", exact()));
         return clientRepository.exists(example);
     }
 }

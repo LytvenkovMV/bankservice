@@ -60,10 +60,13 @@ public class ClientService {
 
 
 
-        if (clientMatcher.isExistsWithSurname(client.getSurname())) {
-            log.info("Клиент с такой фамилией уже существует!!!!!!!!!");
+
+        if (clientMatcher.isExistsWithLogin(client.getLogin())) {
+            log.info("Клиент с таким логином уже существует!!!!!!!!!");
             ////////////throw new Exception();
         }
+
+
 
 
         clientRepository.save(client);

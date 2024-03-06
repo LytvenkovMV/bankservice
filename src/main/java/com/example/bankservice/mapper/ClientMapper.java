@@ -14,8 +14,10 @@ public class ClientMapper {
         client.setSurname(addClientRequestDto.getSurname());
         client.setName(addClientRequestDto.getName());
         client.setMiddlename(addClientRequestDto.getMiddlename());
+        client.setLogin(addClientRequestDto.getLogin());
         client.setBirthDate(addClientRequestDto.getBirthDate());
-        client.setBalance(addClientRequestDto.getBalance());
+        client.setInitBalance(addClientRequestDto.getBalance());
+        client.setCurrBalance(addClientRequestDto.getBalance());
 
         return client;
     }
