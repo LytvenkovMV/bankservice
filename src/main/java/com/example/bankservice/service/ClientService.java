@@ -4,6 +4,7 @@ import com.example.bankservice.dto.AddClientRequestDto;
 import com.example.bankservice.entity.Client;
 import com.example.bankservice.entity.Email;
 import com.example.bankservice.entity.Phone;
+import com.example.bankservice.exception.BadRequestException;
 import com.example.bankservice.mapper.ClientMapper;
 import com.example.bankservice.mapper.EmailMapper;
 import com.example.bankservice.mapper.PhoneMapper;
@@ -12,14 +13,10 @@ import com.example.bankservice.repository.ClientRepository;
 import com.example.bankservice.repository.EmailRepository;
 import com.example.bankservice.repository.PhoneRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.exact;
 
 @Service
 @Slf4j
@@ -58,16 +55,26 @@ public class ClientService {
         List<Phone> phones = phoneMapper.fromAddClientRequestDtoAndClient(addClientRequestDto, client);
         List<Email> emails = emailMapper.fromAddClientRequestDtoAndClient(addClientRequestDto, client);
 
+        List<Client> existingClients = clientRepository.findAll();
 
-
-
-        if (clientMatcher.isExistsWithLogin(client.getLogin())) {
-            log.info("Клиент с таким логином уже существует!!!!!!!!!");
-            ////////////throw new Exception();
+        if (clientMatcher.isExistsWithLogin(existingClients, client.getLogin())) {
+            log.info("Клиент с таким логином уже существует");
+            throw new BadRequestException("Клиент с таким логином уже существует");
         }
 
+        for (Phone phone : phones) {
+            if (clientMatcher.isExistsWithPhone(existingClients, phone.getPhone())) {
+                log.info("Клиент с таким номером телефона уже существует");
+                throw new BadRequestException("Клиент с таким номером телефона уже существует");
+            }
+        }
 
-
+        for (Email email : emails) {
+            if (clientMatcher.isExistsWithEmail(existingClients, email.getEmail())) {
+                log.info("Клиент с таким email уже существует");
+                throw new BadRequestException("Клиент с таким email уже существует");
+            }
+        }
 
         clientRepository.save(client);
         phoneRepository.saveAll(phones);

@@ -38,9 +38,9 @@ public class Client {
     @Column(name = "curr_balance")
     private Double currBalance;
 
-    @OneToMany(mappedBy = "phone")
+    @OneToMany(mappedBy = "client")
     private List<Phone> phones;
 
-    @OneToMany(mappedBy = "email")
+    @OneToMany(mappedBy = "client")
     private List<Email> emails;
 }
