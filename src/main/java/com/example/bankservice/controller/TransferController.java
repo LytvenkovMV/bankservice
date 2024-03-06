@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(value = "Операции с переводами")
 @RestController
-@RequestMapping(path = "/transfer")
+@RequestMapping(path = "/bankservice/transfer")
 public class TransferController {
 
-    private TransferService transferService;
+    private final TransferService transferService;
 
     public TransferController(TransferService transferService) {
         this.transferService = transferService;

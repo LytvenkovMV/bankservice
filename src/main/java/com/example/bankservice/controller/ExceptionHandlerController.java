@@ -16,14 +16,4 @@ public class ExceptionHandlerController {
                 .status(400)
                 .body(errorDto);
     }
-
-//    @ExceptionHandler(value = {CurrencyServiceException.class})
-//    public ResponseEntity<ErrorDto> handleCurrencyServiceEx() {
-//        ErrorDto errorDto = new ErrorDto(503, "Service Unavailable"
-//                , "Внешний сервис курсов валют не доступен. Проверьте адрес сервиса и ключ api в настройках приложения");
-//        return ResponseEntity
-//                .status(503)
-//                .body(errorDto);
-//    }
-
 }
