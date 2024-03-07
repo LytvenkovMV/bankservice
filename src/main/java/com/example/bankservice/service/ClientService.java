@@ -1,6 +1,7 @@
 package com.example.bankservice.service;
 
 import com.example.bankservice.dto.AddClientRequestDto;
+import com.example.bankservice.dto.ModifyEmailRequestDto;
 import com.example.bankservice.dto.ModifyPhoneRequestDto;
 import com.example.bankservice.entity.Client;
 import com.example.bankservice.entity.Email;
@@ -25,7 +26,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ClientService {
 
-    private final ClientMatcher clientMatcher;
     private final ClientRepository clientRepository;
     private final PhoneRepository phoneRepository;
     private final EmailRepository emailRepository;
@@ -34,15 +34,13 @@ public class ClientService {
     private final EmailMapper emailMapper;
     private final Double maxInitBalance;
 
-    public ClientService(ClientMatcher clientMatcher,
-                         ClientRepository clientRepository,
+    public ClientService(ClientRepository clientRepository,
                          PhoneRepository phoneRepository,
                          EmailRepository emailRepository,
                          ClientMapper clientMapper,
                          PhoneMapper phoneMapper,
                          EmailMapper emailMapper,
                          @Value("${client-service.max-init-balance}") Double maxInitBalance) {
-        this.clientMatcher = clientMatcher;
         this.clientRepository = clientRepository;
         this.phoneRepository = phoneRepository;
         this.emailRepository = emailRepository;
@@ -51,6 +49,7 @@ public class ClientService {
         this.emailMapper = emailMapper;
         this.maxInitBalance = maxInitBalance;
     }
+
 
     @Transactional
     public void addClient(AddClientRequestDto addClientRequestDto) {
@@ -64,14 +63,14 @@ public class ClientService {
 
         if (client.getInitBalance() <= 0 || client.getInitBalance() > maxInitBalance)
             ExSender.sendBadRequest("Некорректный начальный баланс");
-        if (clientMatcher.isExistsWithLogin(existingClients, client.getLogin()))
+        if (ClientMatcher.isExistsWithLogin(existingClients, client.getLogin()))
             ExSender.sendBadRequest("Клиент с таким логином уже существует");
         for (Phone phone : phones) {
-            if (clientMatcher.isExistsWithPhone(existingClients, phone.getPhone()))
+            if (ClientMatcher.isExistsWithPhone(existingClients, phone.getPhone()))
                 ExSender.sendBadRequest("Клиент с таким номером телефона уже существует");
         }
         for (Email email : emails) {
-            if (clientMatcher.isExistsWithEmail(existingClients, email.getEmail()))
+            if (ClientMatcher.isExistsWithEmail(existingClients, email.getEmail()))
                 ExSender.sendBadRequest("Клиент с таким email уже существует");
         }
 
@@ -82,46 +81,64 @@ public class ClientService {
         log.info("Клиент сохранен в БД");
     }
 
+
     public void addPhone(ModifyPhoneRequestDto modifyPhoneRequestDto) {
 
         log.info("Получен запрос на добавление телефона клиента: " + modifyPhoneRequestDto.toString());
 
+        Integer clientId = modifyPhoneRequestDto.getClientId();
+        List<Client> existingClients = clientRepository.findAll();
 
-        //////////////////////////////////////////////////////////
-        /// С ЭТИМ НАДО ЧТО ТО ДЕЛАТЬ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ///////////////////////////////////////////////////
-//        try {
-//            client = clientRepository.getById(modifyPhoneRequestDto.getClientId());
-//            phone.setClient(client);
-//            phone.setPhone(modifyPhoneRequestDto.getPhone());
-//        } catch (EntityNotFoundException e) {
-//            log.info("Клиент с таким ИД не найден в БД");
-//            throw new BadRequestException("Клиент с таким ИД не найден в БД");
-//        }
-        //////////////////////////////////////////////////////////////////////////
+        if (!ClientMatcher.isExistsWithId(existingClients, clientId))
+            ExSender.sendBadRequest("Клиент с таким ИД не найден в БД");
+        if (ClientMatcher.isExistsWithPhone(existingClients, modifyPhoneRequestDto.getPhone()))
+            ExSender.sendBadRequest("Такой номер телефона уже существует");
 
-
-        Client client = clientRepository.getById(modifyPhoneRequestDto.getClientId());
+        Client client = clientRepository.getById(clientId);
         Phone phone = new Phone();
         phone.setClient(client);
         phone.setPhone(modifyPhoneRequestDto.getPhone());
-
-        List<Client> existingClients = clientRepository.findAll();
-        if (clientMatcher.isExistsWithPhone(existingClients, phone.getPhone()))
-            ExSender.sendBadRequest("Такой номер телефона уже существует");
-
         phoneRepository.save(phone);
 
         log.info("Телефон сохранен в БД");
     }
 
+
+    public void addEmail(ModifyEmailRequestDto modifyEmailRequestDto) {
+
+        log.info("Получен запрос на добавление email клиента: " + modifyEmailRequestDto.toString());
+
+        Integer clientId = modifyEmailRequestDto.getClientId();
+        List<Client> existingClients = clientRepository.findAll();
+
+        if (!ClientMatcher.isExistsWithId(existingClients, clientId))
+            ExSender.sendBadRequest("Клиент с таким ИД не найден в БД");
+        if (ClientMatcher.isExistsWithEmail(existingClients, modifyEmailRequestDto.getEmail()))
+            ExSender.sendBadRequest("Такой email уже существует");
+
+        Client client = clientRepository.getById(clientId);
+        Email email = new Email();
+        email.setClient(client);
+        email.setEmail(modifyEmailRequestDto.getEmail());
+        emailRepository.save(email);
+
+        log.info("Email сохранен в БД");
+    }
+
+
     public void deletePhone(ModifyPhoneRequestDto modifyPhoneRequestDto) {
 
         log.info("Получен запрос на удаление телефона клиента: " + modifyPhoneRequestDto.toString());
 
-        Client client = clientRepository.getById(modifyPhoneRequestDto.getClientId());
+        Integer clientId = modifyPhoneRequestDto.getClientId();
+        List<Client> existingClients = clientRepository.findAll();
 
+        if (!ClientMatcher.isExistsWithId(existingClients, clientId))
+            ExSender.sendBadRequest("Клиент с таким ИД не найден в БД");
+
+        Client client = clientRepository.getById(clientId);
         List<Phone> existingPhones = client.getPhones();
+
         if (existingPhones.size() < 2)
             ExSender.sendBadRequest("Нельзя удалить последний номер телефона");
 
@@ -132,6 +149,35 @@ public class ClientService {
         if (targetPhones.isEmpty()) ExSender.sendBadRequest("У клиента нет такого номера телефона");
 
         phoneRepository.deleteAll(targetPhones);
+
         log.info("Телефон удален из БД");
+    }
+
+
+    public void deleteEmail(ModifyEmailRequestDto modifyEmailRequestDto) {
+
+        log.info("Получен запрос на удаление email клиента: " + modifyEmailRequestDto.toString());
+
+        Integer clientId = modifyEmailRequestDto.getClientId();
+        List<Client> existingClients = clientRepository.findAll();
+
+        if (!ClientMatcher.isExistsWithId(existingClients, clientId))
+            ExSender.sendBadRequest("Клиент с таким ИД не найден в БД");
+
+        Client client = clientRepository.getById(clientId);
+        List<Email> existingEmails = client.getEmails();
+
+        if (existingEmails.size() < 2)
+            ExSender.sendBadRequest("Нельзя удалить последний email");
+
+        List<Email> targetEmails = existingEmails.stream()
+                .filter(p -> p.getEmail().equals(modifyEmailRequestDto.getEmail()))
+                .collect(Collectors.toList());
+
+        if (targetEmails.isEmpty()) ExSender.sendBadRequest("У клиента нет такого email");
+
+        emailRepository.deleteAll(targetEmails);
+
+        log.info("Email удален из БД");
     }
 }

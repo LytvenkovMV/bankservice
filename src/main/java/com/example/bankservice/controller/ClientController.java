@@ -1,6 +1,7 @@
 package com.example.bankservice.controller;
 
 import com.example.bankservice.dto.AddClientRequestDto;
+import com.example.bankservice.dto.ModifyEmailRequestDto;
 import com.example.bankservice.dto.ModifyPhoneRequestDto;
 import com.example.bankservice.service.ClientService;
 import io.swagger.annotations.Api;
@@ -30,9 +31,21 @@ public class ClientController {
         clientService.addPhone(modifyPhoneRequestDto);
     }
 
-    @ApiOperation(value = "Добавить телефон клиента")
+    @ApiOperation(value = "Удалить телефон клиента")
     @DeleteMapping(path = "/phone")
     public void deletePhone(@RequestBody ModifyPhoneRequestDto modifyPhoneRequestDto) {
         clientService.deletePhone(modifyPhoneRequestDto);
+    }
+
+    @ApiOperation(value = "Добавить email клиента")
+    @PostMapping(path = "/email")
+    public void addEmail(@RequestBody ModifyEmailRequestDto modifyEmailRequestDto) {
+        clientService.addEmail(modifyEmailRequestDto);
+    }
+
+    @ApiOperation(value = "Удалить email клиента")
+    @DeleteMapping(path = "/email")
+    public void deleteEmail(@RequestBody ModifyEmailRequestDto modifyEmailRequestDto) {
+        clientService.deleteEmail(modifyEmailRequestDto);
     }
 }
