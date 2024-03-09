@@ -1,14 +1,13 @@
 package com.example.bankservice.controller;
 
-import com.example.bankservice.dto.AddClientRequestDto;
 import com.example.bankservice.dto.ModifyEmailRequestDto;
 import com.example.bankservice.dto.ModifyPhoneRequestDto;
 import com.example.bankservice.service.ClientService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
-@Api(value = "Операции с клиентами")
+@Tag(name = "Для клиентов")
 @RestController
 @RequestMapping(path = "/bankservice/clients")
 public class ClientController {
@@ -19,31 +18,25 @@ public class ClientController {
         this.clientService = clientService;
     }
 
-    @ApiOperation(value = "Добавить клиента")
-    @PostMapping
-    public void addClient(@RequestBody AddClientRequestDto addClientRequestDto) {
-        clientService.addClient(addClientRequestDto);
-    }
-
-    @ApiOperation(value = "Добавить телефон клиента")
+    @Operation(summary = "Добавить телефон")
     @PostMapping(path = "/phone")
     public void addPhone(@RequestBody ModifyPhoneRequestDto modifyPhoneRequestDto) {
         clientService.addPhone(modifyPhoneRequestDto);
     }
 
-    @ApiOperation(value = "Удалить телефон клиента")
+    @Operation(summary = "Удалить телефон")
     @DeleteMapping(path = "/phone")
     public void deletePhone(@RequestBody ModifyPhoneRequestDto modifyPhoneRequestDto) {
         clientService.deletePhone(modifyPhoneRequestDto);
     }
 
-    @ApiOperation(value = "Добавить email клиента")
+    @Operation(summary = "Добавить email")
     @PostMapping(path = "/email")
     public void addEmail(@RequestBody ModifyEmailRequestDto modifyEmailRequestDto) {
         clientService.addEmail(modifyEmailRequestDto);
     }
 
-    @ApiOperation(value = "Удалить email клиента")
+    @Operation(summary = "Удалить email")
     @DeleteMapping(path = "/email")
     public void deleteEmail(@RequestBody ModifyEmailRequestDto modifyEmailRequestDto) {
         clientService.deleteEmail(modifyEmailRequestDto);

@@ -3,14 +3,11 @@ package com.example.bankservice.service;
 import com.example.bankservice.dto.TransferRequestDto;
 import com.example.bankservice.entity.Client;
 import com.example.bankservice.exception.ExSender;
-import com.example.bankservice.matcher.ClientMatcher;
 import com.example.bankservice.repository.ClientRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Slf4j
@@ -33,17 +30,16 @@ public class TransferService {
         int senderId = transferRequestDto.getSenderId();
         int recipientId = transferRequestDto.getRecipientId();
         double amount = transferRequestDto.getAmount();
-        List<Client> existingClients = clientRepository.findAll();
 
         if (senderId == recipientId) ExSender.sendBadRequest("ИД отправителя и получателя совпадают");
         if (amount <= 0.00 || amount > maxAmount) ExSender.sendBadRequest("Некорректная сумма для перевода");
-        if (!ClientMatcher.isExistsWithId(existingClients, senderId))
+        if (!clientRepository.existsClientById(senderId))
             ExSender.sendBadRequest("Отправитель с таким ИД не найден в БД");
-        if (!ClientMatcher.isExistsWithId(existingClients, recipientId))
+        if (!clientRepository.existsClientById(recipientId))
             ExSender.sendBadRequest("Получатель с таким ИД не найден в БД");
 
-        Client sender = clientRepository.getById(senderId);
-        Client recipient = clientRepository.getById(recipientId);
+        Client sender = clientRepository.getReferenceById(senderId);
+        Client recipient = clientRepository.getReferenceById(recipientId);
         Double senderCurrBalance = sender.getCurrBalance();
         Double recipientCurrBalance = recipient.getCurrBalance();
 
