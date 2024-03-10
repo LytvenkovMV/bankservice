@@ -1,6 +1,6 @@
 package com.example.bankservice.controller;
 
-import com.example.bankservice.entity.Client;
+import com.example.bankservice.dto.SearchClientResponseDto;
 import com.example.bankservice.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,12 +32,12 @@ public class SearchController {
             "/search/{middlename}",
             "/search/{phone}",
             "/search/{email}"})
-    public List<Client> findClientByBirthDate(@PathVariable(required = false) Optional<Date> date,
-                                              @PathVariable(required = false) Optional<String> surname,
-                                              @PathVariable(required = false) Optional<String> name,
-                                              @PathVariable(required = false) Optional<String> middlename,
-                                              @PathVariable(required = false) Optional<String> phone,
-                                              @PathVariable(required = false) Optional<String> email) {
+    public List<SearchClientResponseDto> findClientByBirthDate(@PathVariable(required = false) Optional<Date> date,
+                                                               @PathVariable(required = false) Optional<String> surname,
+                                                               @PathVariable(required = false) Optional<String> name,
+                                                               @PathVariable(required = false) Optional<String> middlename,
+                                                               @PathVariable(required = false) Optional<String> phone,
+                                                               @PathVariable(required = false) Optional<String> email) {
 
         if (date.isPresent()) return searchService.findClientsByBirthDate(date.get());
         if (surname.isPresent() && name.isPresent() && middlename.isPresent())

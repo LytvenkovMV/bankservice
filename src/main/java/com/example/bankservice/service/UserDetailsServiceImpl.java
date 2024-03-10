@@ -1,6 +1,9 @@
 package com.example.bankservice.service;
 
 import com.example.bankservice.entity.Client;
+import com.example.bankservice.entity.Role;
+import com.example.bankservice.enumerator.ERole;
+import com.example.bankservice.mapper.MapStructMapper;
 import com.example.bankservice.repository.ClientRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -8,13 +11,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final ClientRepository clientRepository;
+    private final MapStructMapper mapStructMapper;
 
-    public UserDetailsServiceImpl(ClientRepository clientRepository) {
+    public UserDetailsServiceImpl(ClientRepository clientRepository, MapStructMapper mapStructMapper) {
         this.clientRepository = clientRepository;
+        this.mapStructMapper = mapStructMapper;
     }
 
     @Override
@@ -25,7 +33,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("Клиент с таким логином не найден в БД");
 
         Client client = clientRepository.findClientByUsername(username);
+        Set<Role> roles = new HashSet<>();
+        roles.add(mapStructMapper.fromIdAndName(1, ERole.ROLE_CLIENT));
 
-        return UserDetailsImpl.build(client.getUsername(), client.getPassword(), client.getRoles());
+        return UserDetailsImpl.build(client.getUsername(), client.getPassword(), roles);
     }
 }

@@ -3,9 +3,8 @@ package com.example.bankservice.service;
 import com.example.bankservice.configuration.jwt.JwtUtils;
 import com.example.bankservice.dto.JwtResponseDto;
 import com.example.bankservice.dto.LoginRequestDto;
+import com.example.bankservice.mapper.MapStructMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,10 +22,12 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final MapStructMapper mapStructMapper;
 
-    public AuthService(AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
+    public AuthService(AuthenticationManager authenticationManager, JwtUtils jwtUtils, MapStructMapper mapStructMapper) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
+        this.mapStructMapper = mapStructMapper;
     }
 
     public JwtResponseDto authUser(@RequestBody LoginRequestDto loginRequestDto) {
@@ -40,16 +41,10 @@ public class AuthService {
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
+        String[] roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+                .toArray(String[]::new);
 
-        JwtResponseDto jwtResponseDto = new JwtResponseDto();
-        jwtResponseDto.setToken(jwt);
-        jwtResponseDto.setType("Bearer");
-        jwtResponseDto.setUsername(userDetails.getUsername());
-        jwtResponseDto.setRoles(roles);
-
-        return jwtResponseDto;
+        return mapStructMapper.fromTokenAndTypeAndUserNameAndRoles(jwt, "Bearer", userDetails.getUsername(), roles);
     }
 }

@@ -13,7 +13,6 @@ public class JwtResponseDto {
 
     private String token;
     private String type;
-    private Integer id;
     private String username;
-    private List<String> roles;
+    private String[] roles;
 }

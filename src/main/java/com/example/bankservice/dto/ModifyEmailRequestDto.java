@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModifyEmailRequestDto {
-    @JsonProperty(value = "client-id")
-    private Integer clientId;
 
     @JsonProperty(value = "email")
     private String email;

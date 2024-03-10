@@ -4,12 +4,10 @@ import com.example.bankservice.dto.TransferRequestDto;
 import com.example.bankservice.service.TransferService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Переводы")
 @RestController
@@ -22,10 +20,17 @@ public class TransferController {
         this.transferService = transferService;
     }
 
+    @Operation(summary = "Приветствие")
+    @GetMapping()
+    public ResponseEntity<String> greeting(@RequestHeader(HttpHeaders.AUTHORIZATION) String headerAuth) {
+        return ResponseEntity.status(HttpStatus.OK).body(transferService.greeting(headerAuth));
+    }
+
     @Operation(summary = "Сделать перевод")
     @PostMapping
-    public ResponseEntity<String> addClient(@RequestBody TransferRequestDto transferRequestDto) {
-        transferService.transfer(transferRequestDto);
+    public ResponseEntity<String> addClient(@RequestHeader(HttpHeaders.AUTHORIZATION) String headerAuth,
+                                            @RequestBody TransferRequestDto transferRequestDto) {
+        transferService.transfer(headerAuth, transferRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body("Перевод выполнен");
     }
 }

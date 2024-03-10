@@ -66,9 +66,7 @@ public class EmployeeService {
         }
 
         String encPassword = passwordEncoder.encode(addClientRequestDto.getPassword());
-        Set<Role> roles = new HashSet<>();
-        roles.add(mapStructMapper.fromERole(ERole.ROLE_CLIENT));
-        Client client = mapStructMapper.fromAddClientRequestDtoAndEncPasswordAndRoles(addClientRequestDto, encPassword, roles);
+        Client client = mapStructMapper.fromAddClientRequestDtoAndEncPassword(addClientRequestDto, encPassword);
         List<Phone> phones = mapStructMapper.fromStringPhonesAndClient(addClientRequestDto.getPhones(), client);
         List<Email> emails = mapStructMapper.fromStringEmailsAndClient(addClientRequestDto.getEmails(), client);
 

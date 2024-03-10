@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModifyPhoneRequestDto {
-    @JsonProperty(value = "client-id")
-    private Integer clientId;
 
     @JsonProperty(value = "phone")
     private String phone;

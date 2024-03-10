@@ -1,5 +1,6 @@
 package com.example.bankservice.service;
 
+import com.example.bankservice.configuration.jwt.JwtUtils;
 import com.example.bankservice.dto.TransferRequestDto;
 import com.example.bankservice.entity.Client;
 import com.example.bankservice.exception.ExSender;
@@ -14,32 +15,40 @@ import org.springframework.transaction.annotation.Transactional;
 public class TransferService {
 
     private final ClientRepository clientRepository;
+    private final JwtUtils jwtUtils;
     private final double maxAmount;
 
     public TransferService(ClientRepository clientRepository,
+                           JwtUtils jwtUtils,
                            @Value("${transfer-service.max-amount}") double maxAmount) {
         this.clientRepository = clientRepository;
+        this.jwtUtils = jwtUtils;
         this.maxAmount = maxAmount;
     }
 
+    public String greeting(String headerAuth) {
+        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwt(headerAuth));
+        return "Приветствуем, " + username + "! Это сервис переводов.";
+    }
+
     @Transactional
-    public void transfer(TransferRequestDto transferRequestDto) {
+    public void transfer(String headerAuth, TransferRequestDto transferRequestDto) {
 
         log.info("Получен запрос на перевод " + transferRequestDto.toString());
 
-        int senderId = transferRequestDto.getSenderId();
-        int recipientId = transferRequestDto.getRecipientId();
+        String senderUsername = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwt(headerAuth));
+        String recipientUsername = transferRequestDto.getRecipientUsername();
         double amount = transferRequestDto.getAmount();
 
-        if (senderId == recipientId) ExSender.sendBadRequest("ИД отправителя и получателя совпадают");
+        if (senderUsername.equals(recipientUsername)) ExSender.sendBadRequest("Логин отправителя и логин получателя совпадают");
         if (amount <= 0.00 || amount > maxAmount) ExSender.sendBadRequest("Некорректная сумма для перевода");
-        if (!clientRepository.existsClientById(senderId))
-            ExSender.sendBadRequest("Отправитель с таким ИД не найден в БД");
-        if (!clientRepository.existsClientById(recipientId))
-            ExSender.sendBadRequest("Получатель с таким ИД не найден в БД");
+        if (!clientRepository.existsClientByUsername(senderUsername))
+            ExSender.sendBadRequest("Отправитель с таким логином не найден в БД");
+        if (!clientRepository.existsClientByUsername(recipientUsername))
+            ExSender.sendBadRequest("Получатель с таким логином не найден в БД");
 
-        Client sender = clientRepository.getReferenceById(senderId);
-        Client recipient = clientRepository.getReferenceById(recipientId);
+        Client sender = clientRepository.findClientByUsername(senderUsername);
+        Client recipient = clientRepository.findClientByUsername(recipientUsername);
         Double senderCurrBalance = sender.getCurrBalance();
         Double recipientCurrBalance = recipient.getCurrBalance();
 
