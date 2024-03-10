@@ -21,8 +21,11 @@ public class AddClientRequestDto {
     @JsonProperty(value = "middlename")
     private String middlename;
 
-    @JsonProperty(value = "login")
-    private String login;
+    @JsonProperty(value = "username")
+    private String username;
+
+    @JsonProperty(value = "password")
+    private String password;
 
     @JsonProperty(value = "birth_date")
     @JsonFormat(pattern = "yyyy-mm-dd")

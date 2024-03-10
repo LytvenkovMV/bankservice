@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -26,8 +28,11 @@ public class Client {
     @Column(name = "middlename")
     private String middlename;
 
-    @Column(name = "login")
-    private String login;
+    @Column(name = "username")
+    private String username;
+
+    @Column(name = "password")
+    private String password;
 
     @Column(name = "birth_date")
     private Date birthDate;
@@ -43,4 +48,10 @@ public class Client {
 
     @OneToMany(mappedBy = "client")
     private List<Email> emails;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 }

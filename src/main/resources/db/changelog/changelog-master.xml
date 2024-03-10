@@ -6,4 +6,6 @@
     <include file="create-changeset-clients-table.xml" relativeToChangelogFile="true"/>
     <include file="create-changeset-phones-table.xml" relativeToChangelogFile="true"/>
     <include file="create-changeset-emails-table.xml" relativeToChangelogFile="true"/>
+    <include file="create-changeset-roles-table.xml" relativeToChangelogFile="true"/>
+    <include file="create-changeset-user-roles-table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

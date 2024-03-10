@@ -10,10 +10,11 @@ import java.util.List;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Integer> {
 
-    boolean existsClientByLogin(String login);
+    boolean existsClientByUsername(String username);
 
     boolean existsClientById(Integer id);
 
+    Client findClientByUsername(String username);
     List<Client> findClientsByBirthDateIsAfter(Date date);
     List<Client> findClientsBySurnameLikeAndNameLikeAndMiddlenameLike(String surname, String name, String middlename);
 }

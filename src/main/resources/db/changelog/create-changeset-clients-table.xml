@@ -20,7 +20,10 @@
             <column name="middlename" type="varchar(30)">
                 <constraints nullable="false"/>
             </column>
-            <column name="login" type="varchar(30)">
+            <column name="username" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
             <column name="birth_date" type="DATE">
