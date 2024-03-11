@@ -12,16 +12,16 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class BalanceService {
+public class ChargeService {
 
     private final double maxCoeff;
     private final double addCoeff;
     private static final String delay = "${balance-service.period-millis}";
     private final ClientRepository clientRepository;
 
-    public BalanceService(@Value("${balance-service.maximum-percent}") Integer maxPercent,
-                          @Value("${balance-service.additional-percent}") Integer addPercent,
-                          ClientRepository clientRepository) {
+    public ChargeService(@Value("${balance-service.maximum-percent}") Integer maxPercent,
+                         @Value("${balance-service.additional-percent}") Integer addPercent,
+                         ClientRepository clientRepository) {
         this.maxCoeff = ((double) maxPercent) / 100;
         this.addCoeff = ((double) addPercent) / 100;
         this.clientRepository = clientRepository;

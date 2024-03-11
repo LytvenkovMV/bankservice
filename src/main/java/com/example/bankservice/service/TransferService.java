@@ -1,12 +1,13 @@
 package com.example.bankservice.service;
 
-import com.example.bankservice.configuration.jwt.JwtUtils;
 import com.example.bankservice.dto.TransferRequestDto;
 import com.example.bankservice.entity.Client;
 import com.example.bankservice.exception.ExSender;
 import com.example.bankservice.repository.ClientRepository;
+import jakarta.persistence.LockModeType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,32 +16,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class TransferService {
 
     private final ClientRepository clientRepository;
-    private final JwtUtils jwtUtils;
     private final double maxAmount;
 
     public TransferService(ClientRepository clientRepository,
-                           JwtUtils jwtUtils,
                            @Value("${transfer-service.max-amount}") double maxAmount) {
         this.clientRepository = clientRepository;
-        this.jwtUtils = jwtUtils;
         this.maxAmount = maxAmount;
     }
 
-    public String greeting(String headerAuth) {
-        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwt(headerAuth));
+    public String greeting(String username) {
         return "Приветствуем, " + username + "! Это сервис переводов.";
     }
 
     @Transactional
-    public void transfer(String headerAuth, TransferRequestDto transferRequestDto) {
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public void transfer(String senderUsername, TransferRequestDto transferRequestDto) {
 
         log.info("Получен запрос на перевод " + transferRequestDto.toString());
 
-        String senderUsername = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwt(headerAuth));
         String recipientUsername = transferRequestDto.getRecipientUsername();
         double amount = transferRequestDto.getAmount();
 
-        if (senderUsername.equals(recipientUsername)) ExSender.sendBadRequest("Логин отправителя и логин получателя совпадают");
+        if (senderUsername.equals(recipientUsername))
+            ExSender.sendBadRequest("Логин отправителя и логин получателя совпадают");
         if (amount <= 0.00 || amount > maxAmount) ExSender.sendBadRequest("Некорректная сумма для перевода");
         if (!clientRepository.existsClientByUsername(senderUsername))
             ExSender.sendBadRequest("Отправитель с таким логином не найден в БД");

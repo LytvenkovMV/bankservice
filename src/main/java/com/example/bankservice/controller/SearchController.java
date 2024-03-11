@@ -32,7 +32,7 @@ public class SearchController {
             "/search/{middlename}",
             "/search/{phone}",
             "/search/{email}"})
-    public List<SearchClientResponseDto> findClientByBirthDate(@PathVariable(required = false) Optional<Date> date,
+    public List<SearchClientResponseDto> findClient(@PathVariable(required = false) Optional<Date> date,
                                                                @PathVariable(required = false) Optional<String> surname,
                                                                @PathVariable(required = false) Optional<String> name,
                                                                @PathVariable(required = false) Optional<String> middlename,

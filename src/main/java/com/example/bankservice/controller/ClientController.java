@@ -2,6 +2,7 @@ package com.example.bankservice.controller;
 
 import com.example.bankservice.dto.ModifyEmailRequestDto;
 import com.example.bankservice.dto.ModifyPhoneRequestDto;
+import com.example.bankservice.service.AuthService;
 import com.example.bankservice.service.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,23 +16,25 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/bankservice/clients")
 public class ClientController {
 
+    private final AuthService authService;
     private final ClientService clientService;
 
-    public ClientController(ClientService clientService) {
+    public ClientController(AuthService authService, ClientService clientService) {
+        this.authService = authService;
         this.clientService = clientService;
     }
 
     @Operation(summary = "Приветствие")
     @GetMapping()
     public ResponseEntity<String> greeting(@RequestHeader(HttpHeaders.AUTHORIZATION) String headerAuth) {
-        return ResponseEntity.status(HttpStatus.OK).body(clientService.greeting(headerAuth));
+        return ResponseEntity.status(HttpStatus.OK).body(clientService.greeting(authService.getUsername(headerAuth)));
     }
 
     @Operation(summary = "Добавить телефон")
     @PostMapping(path = "/phone")
     public ResponseEntity<String> addPhone(@RequestHeader(HttpHeaders.AUTHORIZATION) String headerAuth,
                                            @RequestBody ModifyPhoneRequestDto modifyPhoneRequestDto) {
-        clientService.addPhone(headerAuth, modifyPhoneRequestDto);
+        clientService.addPhone(authService.getUsername(headerAuth), modifyPhoneRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body("Телефон добавлен");
     }
 
@@ -39,7 +42,7 @@ public class ClientController {
     @DeleteMapping(path = "/phone")
     public ResponseEntity<String> deletePhone(@RequestHeader(HttpHeaders.AUTHORIZATION) String headerAuth,
                                               @RequestBody ModifyPhoneRequestDto modifyPhoneRequestDto) {
-        clientService.deletePhone(headerAuth, modifyPhoneRequestDto);
+        clientService.deletePhone(authService.getUsername(headerAuth), modifyPhoneRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body("Телефон удален");
     }
 
@@ -47,7 +50,7 @@ public class ClientController {
     @PostMapping(path = "/email")
     public ResponseEntity<String> addEmail(@RequestHeader(HttpHeaders.AUTHORIZATION) String headerAuth,
                                            @RequestBody ModifyEmailRequestDto modifyEmailRequestDto) {
-        clientService.addEmail(headerAuth, modifyEmailRequestDto);
+        clientService.addEmail(authService.getUsername(headerAuth), modifyEmailRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body("Email добавлен");
     }
 
@@ -55,7 +58,7 @@ public class ClientController {
     @DeleteMapping(path = "/email")
     public ResponseEntity<String> deleteEmail(@RequestHeader(HttpHeaders.AUTHORIZATION) String headerAuth,
                                               @RequestBody ModifyEmailRequestDto modifyEmailRequestDto) {
-        clientService.deleteEmail(headerAuth, modifyEmailRequestDto);
+        clientService.deleteEmail(authService.getUsername(headerAuth), modifyEmailRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body("Email удален");
     }
 }

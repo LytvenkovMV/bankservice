@@ -1,6 +1,5 @@
 package com.example.bankservice.service;
 
-import com.example.bankservice.configuration.jwt.JwtUtils;
 import com.example.bankservice.dto.ModifyEmailRequestDto;
 import com.example.bankservice.dto.ModifyPhoneRequestDto;
 import com.example.bankservice.entity.Client;
@@ -22,25 +21,21 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final PhoneRepository phoneRepository;
     private final EmailRepository emailRepository;
-    private final JwtUtils jwtUtils;
 
-    public ClientService(ClientRepository clientRepository, PhoneRepository phoneRepository, EmailRepository emailRepository, JwtUtils jwtUtils) {
+    public ClientService(ClientRepository clientRepository, PhoneRepository phoneRepository, EmailRepository emailRepository) {
         this.clientRepository = clientRepository;
         this.phoneRepository = phoneRepository;
         this.emailRepository = emailRepository;
-        this.jwtUtils = jwtUtils;
     }
 
-    public String greeting(String headerAuth) {
-        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwt(headerAuth));
+    public String greeting(String username) {
         return "Приветствуем, " + username + "! Это сервис для клиентов.";
     }
 
-    public void addPhone(String headerAuth, ModifyPhoneRequestDto modifyPhoneRequestDto) {
+    public void addPhone(String username, ModifyPhoneRequestDto modifyPhoneRequestDto) {
 
         log.info("Получен запрос на добавление телефона клиента: " + modifyPhoneRequestDto.toString());
 
-        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwt(headerAuth));
         if (!clientRepository.existsClientByUsername(username))
             ExSender.sendBadRequest("Клиент с таким логином не найден в БД");
         if (phoneRepository.existsPhoneByPhone(modifyPhoneRequestDto.getPhone()))
@@ -54,11 +49,10 @@ public class ClientService {
         log.info("Телефон сохранен в БД");
     }
 
-    public void addEmail(String headerAuth, ModifyEmailRequestDto modifyEmailRequestDto) {
+    public void addEmail(String username, ModifyEmailRequestDto modifyEmailRequestDto) {
 
         log.info("Получен запрос на добавление email клиента: " + modifyEmailRequestDto.toString());
 
-        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwt(headerAuth));
         if (!clientRepository.existsClientByUsername(username))
             ExSender.sendBadRequest("Клиент с таким логином не найден в БД");
         if (emailRepository.existsEmailByEmail(modifyEmailRequestDto.getEmail()))
@@ -72,11 +66,10 @@ public class ClientService {
         log.info("Email сохранен в БД");
     }
 
-    public void deletePhone(String headerAuth, ModifyPhoneRequestDto modifyPhoneRequestDto) {
+    public void deletePhone(String username, ModifyPhoneRequestDto modifyPhoneRequestDto) {
 
         log.info("Получен запрос на удаление телефона клиента: " + modifyPhoneRequestDto.toString());
 
-        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwt(headerAuth));
         if (!clientRepository.existsClientByUsername(username))
             ExSender.sendBadRequest("Клиент с таким логином не найден в БД");
         if (!phoneRepository.existsPhoneByPhone(modifyPhoneRequestDto.getPhone()))
@@ -96,11 +89,10 @@ public class ClientService {
         log.info("Телефон удален из БД");
     }
 
-    public void deleteEmail(String headerAuth, ModifyEmailRequestDto modifyEmailRequestDto) {
+    public void deleteEmail(String username, ModifyEmailRequestDto modifyEmailRequestDto) {
 
         log.info("Получен запрос на удаление email клиента: " + modifyEmailRequestDto.toString());
 
-        String username = jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwt(headerAuth));
         if (!clientRepository.existsClientByUsername(username))
             ExSender.sendBadRequest("Клиент с таким логином не найден в БД");
         if (!emailRepository.existsEmailByEmail(modifyEmailRequestDto.getEmail()))

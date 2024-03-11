@@ -47,4 +47,8 @@ public class AuthService {
 
         return mapStructMapper.fromTokenAndTypeAndUserNameAndRoles(jwt, "Bearer", userDetails.getUsername(), roles);
     }
+
+    public String getUsername(String headerAuth) {
+        return jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwt(headerAuth));
+    }
 }
