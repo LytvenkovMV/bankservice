@@ -1,20 +1,16 @@
 package com.example.bankservice.service;
 
-import com.example.bankservice.comparator.ComparatorByBirthDate;
-import com.example.bankservice.comparator.ComparatorById;
-import com.example.bankservice.comparator.ComparatorBySurname;
 import com.example.bankservice.dto.SearchClientResponseDto;
+import com.example.bankservice.dto.SearchFilterDto;
 import com.example.bankservice.entity.Client;
-import com.example.bankservice.entity.Email;
 import com.example.bankservice.entity.Phone;
 import com.example.bankservice.mapper.MapStructMapper;
 import com.example.bankservice.repository.ClientRepository;
-import com.example.bankservice.repository.EmailRepository;
-import com.example.bankservice.repository.PhoneRepository;
+import jakarta.persistence.criteria.Join;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,102 +19,86 @@ import java.util.List;
 public class SearchService {
 
     private final ClientRepository clientRepository;
-    private final PhoneRepository phoneRepository;
-    private final EmailRepository emailRepository;
     private final MapStructMapper mapStructMapper;
 
     public SearchService(ClientRepository clientRepository,
-                         PhoneRepository phoneRepository,
-                         EmailRepository emailRepository,
                          MapStructMapper mapStructMapper) {
         this.clientRepository = clientRepository;
-        this.phoneRepository = phoneRepository;
-        this.emailRepository = emailRepository;
         this.mapStructMapper = mapStructMapper;
     }
 
-    public List<SearchClientResponseDto> findAllClients() {
-
-        log.info("Получен запрос на поиск всех клиентов");
-
-        List<Client> clients = clientRepository.findAll();
-        clients.sort(new ComparatorById());
-        List<SearchClientResponseDto> dtoList = new ArrayList<>();
-        for (Client c : clients) {
-            dtoList.add(mapStructMapper.fromClient(c));
-        }
-        log.info("Найден список клиентов:" + dtoList);
-
-        return dtoList;
+    public String greeting(String username) {
+        return "Приветствуем, " + username + "! Это сервис для поиска.";
     }
 
-    public List<SearchClientResponseDto> findClientsByBirthDate(Date sample) {
+    public List<SearchClientResponseDto> findClients(SearchFilterDto searchFilterDto) {
 
-        log.info("Получен запрос на поиск клиентов по дате рождения:" + sample);
+        log.info("Получен запрос на поиск клиентов");
 
-        List<Client> clients = clientRepository.findClientsByBirthDateIsAfter(sample);
-        clients.sort(new ComparatorByBirthDate());
-        List<SearchClientResponseDto> dtoList = new ArrayList<>();
-        for (Client c : clients) {
-            dtoList.add(mapStructMapper.fromClient(c));
+        Specification<Client> specification = hasNotNullId();
+        if (!searchFilterDto.getSurname().equals("***")) {
+            specification = specification.and(hasSurnameLike(searchFilterDto.getSurname()));
+        }
+        if (!searchFilterDto.getName().equals("***")) {
+            specification = specification.and(hasNameLike(searchFilterDto.getName()));
+        }
+        if (!searchFilterDto.getMiddlename().equals("***")) {
+            specification = specification.and(hasMiddlenameLike(searchFilterDto.getMiddlename()));
+        }
+        if (!searchFilterDto.getBirthDate().equals("***")) {
+            specification = specification.and(hasBirthDateGreaterThan(searchFilterDto.getBirthDate()));
+        }
+        if (!searchFilterDto.getPhone().equals("***")) {
+            specification = specification.and(hasPhone(searchFilterDto.getPhone()));
+        }
+        if (!searchFilterDto.getEmail().equals("***")) {
+            specification = specification.and(hasEmail(searchFilterDto.getEmail()));
         }
 
-        log.info("Найден список клиентов:" + dtoList);
-
-        return dtoList;
-    }
-
-    public List<SearchClientResponseDto> findClientsByFIO(String surname, String name, String middlename) {
-
-        log.info("Получен запрос на поиск клиентов по ФИО:" + surname + name + middlename);
-
-        List<Client> clients = clientRepository.findClientsBySurnameLikeAndNameLikeAndMiddlenameLike(surname, name, middlename);
-        clients.sort(new ComparatorBySurname());
-        List<SearchClientResponseDto> dtoList = new ArrayList<>();
-        for (Client c : clients) {
-            dtoList.add(mapStructMapper.fromClient(c));
-        }
+        List<Client> clients = clientRepository.findAll(specification);
+        List<SearchClientResponseDto> dtoList = mapStructMapper.fromClients(clients);
 
         log.info("Найден список клиентов:" + dtoList);
 
         return dtoList;
     }
 
-    public List<SearchClientResponseDto> findClientsByPhone(String sample) {
-
-        log.info("Получен запрос на поиск клиентов по номеру телефона:" + sample);
-
-        List<Client> clients = new ArrayList<>();
-        if (phoneRepository.existsPhoneByPhone(sample)) {
-            Phone phone = phoneRepository.findByPhone(sample);
-            clients.add(phone.getClient());
-        }
-        List<SearchClientResponseDto> dtoList = new ArrayList<>();
-        for (Client c : clients) {
-            dtoList.add(mapStructMapper.fromClient(c));
-        }
-
-        log.info("Найден клиент:" + dtoList);
-
-        return dtoList;
+    private static Specification<Client> hasNotNullId() {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.isNotNull(root.get("id"));
     }
 
-    public List<SearchClientResponseDto> findClientsByEmail(String sample) {
+    private static Specification<Client> hasSurnameLike(String surname) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.like(root.get("surname"), "%" + surname + "%");
+    }
 
-        log.info("Получен запрос на поиск клиентов по email:" + sample);
+    private static Specification<Client> hasNameLike(String name) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.like(root.get("name"), "%" + name + "%");
+    }
 
-        List<Client> clients = new ArrayList<>();
-        if (emailRepository.existsEmailByEmail(sample)) {
-            Email email = emailRepository.findByEmail(sample);
-            clients.add(email.getClient());
-        }
-        List<SearchClientResponseDto> dtoList = new ArrayList<>();
-        for (Client c : clients) {
-            dtoList.add(mapStructMapper.fromClient(c));
-        }
+    private static Specification<Client> hasMiddlenameLike(String middlename) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.like(root.get("middlename"), "%" + middlename + "%");
+    }
 
-        log.info("Найден клиент:" + dtoList);
+    private static Specification<Client> hasBirthDateGreaterThan(Date birthDate) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.greaterThan(root.get("birthDate"), birthDate);
+    }
 
-        return dtoList;
+    public static Specification<Client> hasPhone(String phone) {
+        return (root, query, criteriaBuilder) -> {
+            Join<Client, Phone> clientPhoneJoin = root.join("phones");
+            return criteriaBuilder.equal(clientPhoneJoin.get("phone"), phone);
+        };
+    }
+
+    public static Specification<Client> hasEmail(String email) {
+        return (root, query, criteriaBuilder) -> {
+            Join<Client, Phone> clientPhoneJoin = root.join("emails");
+            return criteriaBuilder.equal(clientPhoneJoin.get("email"), email);
+        };
     }
 }

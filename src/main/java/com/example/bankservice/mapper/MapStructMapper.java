@@ -8,7 +8,6 @@ import com.example.bankservice.entity.Email;
 import com.example.bankservice.entity.Phone;
 import com.example.bankservice.entity.Role;
 import com.example.bankservice.enumerator.ERole;
-import com.example.bankservice.service.UserDetailsImpl;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -37,6 +36,14 @@ public interface MapStructMapper {
     Email fromEmailAndClient(String email, Client client);
 
     Role fromIdAndName(Integer id, ERole name);
+
+    default List<SearchClientResponseDto> fromClients(List<Client> clients) {
+        List<SearchClientResponseDto> dtoList = new ArrayList<>();
+        for (Client c : clients) {
+            dtoList.add(fromClient(c));
+        }
+        return dtoList;
+    }
 
     default List<Phone> fromStringPhonesAndClient(String[] stringPhones, Client client) {
         List<Phone> phones = new ArrayList<>();
