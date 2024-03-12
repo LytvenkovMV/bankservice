@@ -1,41 +1,38 @@
 package com.example.bankservice.service;
 
-import com.example.bankservice.configuration.jwt.JwtUtils;
 import com.example.bankservice.dto.TransferRequestDto;
 import com.example.bankservice.entity.Client;
 import com.example.bankservice.repository.ClientRepository;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 
 class TransferServiceTest {
 
-    @Mock
-    private JwtUtils jwtUtils;
+    private final TransferService transferService;
+    private final ClientRepository clientRepository;
 
-    @Mock
-    private ClientRepository clientRepository;
-
-    @InjectMocks
-    private TransferService transferService;
+    public TransferServiceTest(TransferService transferService, ClientRepository clientRepository) {
+        this.transferService = transferService;
+        this.clientRepository = clientRepository;
+    }
 
     @Test
     void transfer() {
 
+
         //given
 
-        Double amount = 2.0;
-        Double senderCurrBalance = 10.0;
-        Double recipientCurrBalance = 10.0;
-        String senderUserName = "ivan1";
-        String recipientUserName = "ivan2";
+        String amount = "2.0";
 
-        String headerAuth = "headerauth";
+        String senderUserName = "ivan1";
+        BigDecimal senderCurrBalance = new BigDecimal(10);
+
+        String recipientUserName = "ivan2";
+        BigDecimal recipientCurrBalance = new BigDecimal(10);
+
 
         TransferRequestDto transferRequestDto = new TransferRequestDto();
         transferRequestDto.setRecipientUsername(recipientUserName);
@@ -49,27 +46,22 @@ class TransferServiceTest {
         sender.setUsername(recipientUserName);
         sender.setCurrBalance(recipientCurrBalance);
 
-        Mockito
-                .when(jwtUtils.getUserNameFromJwtToken(jwtUtils.getJwt(any())))
-                .thenReturn(senderUserName);
+        clientRepository.save(sender);
+        clientRepository.save(recipient);
 
-        Mockito
-                .when(clientRepository.findClientByUsername(senderUserName))
-                .thenReturn(sender);
-
-        Mockito
-                .when(clientRepository.findClientByUsername(recipientUserName))
-                .thenReturn(recipient);
 
         //when
 
-        transferService.transfer(headerAuth, transferRequestDto);
+        transferService.transfer(senderUserName, transferRequestDto);
 
 
         //then
 
+        sender = clientRepository.findClientByUsername(senderUserName);
+        recipient = clientRepository.findClientByUsername(recipientUserName);
 
 
-
+        assertEquals(senderCurrBalance.subtract(new BigDecimal(amount)), sender.getCurrBalance());
+        assertEquals(recipientCurrBalance.add(new BigDecimal(amount)), recipient.getCurrBalance());
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,20 +31,20 @@ public class EmployeeService {
     private final PhoneRepository phoneRepository;
     private final EmailRepository emailRepository;
     private final MapStructMapper mapStructMapper;
-    private final Double maxInitBalance;
+    private final BigDecimal maxInitBalance;
 
     public EmployeeService(PasswordEncoder passwordEncoder,
                            ClientRepository clientRepository,
                            PhoneRepository phoneRepository,
                            EmailRepository emailRepository,
                            MapStructMapper mapStructMapper,
-                           @Value("${employee-service.max-init-balance}") Double maxInitBalance) {
+                           @Value("${employee-service.max-init-balance}") String maxInitBalance) {
         this.passwordEncoder = passwordEncoder;
         this.clientRepository = clientRepository;
         this.phoneRepository = phoneRepository;
         this.emailRepository = emailRepository;
         this.mapStructMapper = mapStructMapper;
-        this.maxInitBalance = maxInitBalance;
+        this.maxInitBalance = new BigDecimal(maxInitBalance);
     }
 
 
@@ -52,7 +53,8 @@ public class EmployeeService {
 
         log.info("Получен запрос на добавление клиента: " + addClientRequestDto.toString());
 
-        if (addClientRequestDto.getBalance() <= 0 || addClientRequestDto.getBalance() > maxInitBalance)
+        BigDecimal initBalance = new BigDecimal(addClientRequestDto.getBalance());
+        if ((initBalance.compareTo(new BigDecimal(0)) <= 0) || (initBalance.compareTo(maxInitBalance) > 0))
             ExSender.sendBadRequest("Некорректный начальный баланс");
         if (clientRepository.existsClientByUsername(addClientRequestDto.getUsername()))
             ExSender.sendBadRequest("Клиент с таким логином уже существует");

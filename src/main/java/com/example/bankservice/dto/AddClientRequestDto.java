@@ -32,7 +32,7 @@ public class AddClientRequestDto {
     private Date birthDate;
 
     @JsonProperty(value = "balance")
-    private Double balance;
+    private String balance;
 
     @JsonProperty(value = "phones")
     private String[] phones;

@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -15,7 +16,7 @@ import java.util.List;
 public class ChargeService {
 
     private final double maxCoeff;
-    private final double addCoeff;
+    private final double chargeCoeff;
     private static final String delay = "${balance-service.period-millis}";
     private final ClientRepository clientRepository;
 
@@ -23,7 +24,7 @@ public class ChargeService {
                          @Value("${balance-service.additional-percent}") Integer addPercent,
                          ClientRepository clientRepository) {
         this.maxCoeff = ((double) maxPercent) / 100;
-        this.addCoeff = ((double) addPercent) / 100;
+        this.chargeCoeff = ((double) addPercent) / 100;
         this.clientRepository = clientRepository;
     }
 
@@ -40,10 +41,12 @@ public class ChargeService {
         log.info("Выполнено периодическое начисление процентов");
     }
 
-    private Double getNewBalance(Double initBalance, Double currBalance) {
-        double newBalance = currBalance + currBalance * addCoeff;
-        double maxBalance = initBalance * maxCoeff;
-        if (newBalance > maxBalance) newBalance = maxBalance;
+    private BigDecimal getNewBalance(BigDecimal initBalance, BigDecimal currBalance) {
+        BigDecimal newBalance = currBalance.add(currBalance.multiply(new BigDecimal(chargeCoeff)));
+        BigDecimal maxBalance = initBalance.multiply(new BigDecimal(maxCoeff));
+        if (newBalance.compareTo(maxBalance) > 0) {
+            newBalance = maxBalance;
+        }
         return newBalance;
     }
 }

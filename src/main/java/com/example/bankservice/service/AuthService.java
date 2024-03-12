@@ -32,6 +32,8 @@ public class AuthService {
 
     public JwtResponseDto authUser(@RequestBody LoginRequestDto loginRequestDto) {
 
+        log.info("Поступил запрос на аутентификацию клиента " + loginRequestDto.toString());
+
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(
                         loginRequestDto.getUsername(),

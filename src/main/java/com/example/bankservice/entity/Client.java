@@ -4,10 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -38,10 +37,10 @@ public class Client {
     private Date birthDate;
 
     @Column(name = "init_balance")
-    private Double initBalance;
+    private BigDecimal initBalance;
 
     @Column(name = "curr_balance")
-    private Double currBalance;
+    private BigDecimal currBalance;
 
     @OneToMany(mappedBy = "client")
     private List<Phone> phones;

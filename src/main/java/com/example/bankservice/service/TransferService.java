@@ -11,17 +11,19 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Service
 @Slf4j
 public class TransferService {
 
     private final ClientRepository clientRepository;
-    private final double maxAmount;
+    private final BigDecimal maxAmount;
 
     public TransferService(ClientRepository clientRepository,
-                           @Value("${transfer-service.max-amount}") double maxAmount) {
+                           @Value("${transfer-service.max-amount}") String maxAmount) {
         this.clientRepository = clientRepository;
-        this.maxAmount = maxAmount;
+        this.maxAmount = new BigDecimal(maxAmount);
     }
 
     public String greeting(String username) {
@@ -35,11 +37,12 @@ public class TransferService {
         log.info("Получен запрос на перевод " + transferRequestDto.toString());
 
         String recipientUsername = transferRequestDto.getRecipientUsername();
-        double amount = transferRequestDto.getAmount();
+        BigDecimal amount = new BigDecimal(transferRequestDto.getAmount());
 
         if (senderUsername.equals(recipientUsername))
             ExSender.sendBadRequest("Логин отправителя и логин получателя совпадают");
-        if (amount <= 0.00 || amount > maxAmount) ExSender.sendBadRequest("Некорректная сумма для перевода");
+        if ((amount.compareTo(new BigDecimal(0)) <= 0) || (amount.compareTo(maxAmount) > 0))
+            ExSender.sendBadRequest("Некорректная сумма для перевода");
         if (!clientRepository.existsClientByUsername(senderUsername))
             ExSender.sendBadRequest("Отправитель с таким логином не найден в БД");
         if (!clientRepository.existsClientByUsername(recipientUsername))
@@ -47,13 +50,13 @@ public class TransferService {
 
         Client sender = clientRepository.findClientByUsername(senderUsername);
         Client recipient = clientRepository.findClientByUsername(recipientUsername);
-        Double senderCurrBalance = sender.getCurrBalance();
-        Double recipientCurrBalance = recipient.getCurrBalance();
+        BigDecimal senderCurrBalance = sender.getCurrBalance();
+        BigDecimal recipientCurrBalance = recipient.getCurrBalance();
 
-        if (amount > senderCurrBalance) ExSender.sendBadRequest("У отправителя недостаточно средств для перевода");
+        if (amount.compareTo(senderCurrBalance) > 0) ExSender.sendBadRequest("У отправителя недостаточно средств для перевода");
 
-        sender.setCurrBalance(senderCurrBalance - amount);
-        recipient.setCurrBalance(recipientCurrBalance + amount);
+        sender.setCurrBalance(senderCurrBalance.subtract(amount));
+        recipient.setCurrBalance(recipientCurrBalance.add(amount));
         clientRepository.save(sender);
         clientRepository.save(recipient);
 
