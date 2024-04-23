@@ -7,6 +7,7 @@ import com.example.bankservice.entity.Phone;
 import com.example.bankservice.mapper.MapStructMapper;
 import com.example.bankservice.repository.ClientRepository;
 import jakarta.persistence.criteria.Join;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -16,16 +17,11 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SearchService {
 
     private final ClientRepository clientRepository;
     private final MapStructMapper mapStructMapper;
-
-    public SearchService(ClientRepository clientRepository,
-                         MapStructMapper mapStructMapper) {
-        this.clientRepository = clientRepository;
-        this.mapStructMapper = mapStructMapper;
-    }
 
     public String greeting(String username) {
         return "Приветствуем, " + username + "! Это сервис для поиска.";

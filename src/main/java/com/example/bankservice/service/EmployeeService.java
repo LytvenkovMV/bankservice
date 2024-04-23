@@ -4,8 +4,6 @@ import com.example.bankservice.dto.AddClientRequestDto;
 import com.example.bankservice.entity.Client;
 import com.example.bankservice.entity.Email;
 import com.example.bankservice.entity.Phone;
-import com.example.bankservice.entity.Role;
-import com.example.bankservice.enumerator.ERole;
 import com.example.bankservice.exception.ExSender;
 import com.example.bankservice.mapper.MapStructMapper;
 import com.example.bankservice.repository.ClientRepository;
@@ -18,9 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Slf4j

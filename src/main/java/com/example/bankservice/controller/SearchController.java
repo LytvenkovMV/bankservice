@@ -6,6 +6,7 @@ import com.example.bankservice.service.AuthService;
 import com.example.bankservice.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,15 +17,11 @@ import java.util.List;
 @Tag(name = "Поиск")
 @RestController
 @RequestMapping(path = "/bankservice/search")
+@RequiredArgsConstructor
 public class SearchController {
 
     private final AuthService authService;
     private final SearchService searchService;
-
-    public SearchController(AuthService authService, SearchService searchService) {
-        this.authService = authService;
-        this.searchService = searchService;
-    }
 
     @Operation(summary = "Приветствие")
     @GetMapping()

@@ -6,6 +6,7 @@ import com.example.bankservice.service.AuthService;
 import com.example.bankservice.service.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,15 +15,11 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Для клиентов")
 @RestController
 @RequestMapping(path = "/bankservice/clients")
+@RequiredArgsConstructor
 public class ClientController {
 
     private final AuthService authService;
     private final ClientService clientService;
-
-    public ClientController(AuthService authService, ClientService clientService) {
-        this.authService = authService;
-        this.clientService = clientService;
-    }
 
     @Operation(summary = "Приветствие")
     @GetMapping()

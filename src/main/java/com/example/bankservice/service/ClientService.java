@@ -9,6 +9,7 @@ import com.example.bankservice.exception.ExSender;
 import com.example.bankservice.repository.ClientRepository;
 import com.example.bankservice.repository.EmailRepository;
 import com.example.bankservice.repository.PhoneRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,17 +17,12 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ClientService {
 
     private final ClientRepository clientRepository;
     private final PhoneRepository phoneRepository;
     private final EmailRepository emailRepository;
-
-    public ClientService(ClientRepository clientRepository, PhoneRepository phoneRepository, EmailRepository emailRepository) {
-        this.clientRepository = clientRepository;
-        this.phoneRepository = phoneRepository;
-        this.emailRepository = emailRepository;
-    }
 
     public String greeting(String username) {
         return "Приветствуем, " + username + "! Это сервис для клиентов.";

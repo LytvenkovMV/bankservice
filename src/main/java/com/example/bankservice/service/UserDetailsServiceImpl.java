@@ -5,6 +5,8 @@ import com.example.bankservice.entity.Role;
 import com.example.bankservice.enumerator.ERole;
 import com.example.bankservice.mapper.MapStructMapper;
 import com.example.bankservice.repository.ClientRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,15 +17,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final ClientRepository clientRepository;
     private final MapStructMapper mapStructMapper;
-
-    public UserDetailsServiceImpl(ClientRepository clientRepository, MapStructMapper mapStructMapper) {
-        this.clientRepository = clientRepository;
-        this.mapStructMapper = mapStructMapper;
-    }
 
     @Override
     @Transactional

@@ -5,6 +5,7 @@ import com.example.bankservice.service.AuthService;
 import com.example.bankservice.service.TransferService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Переводы")
 @RestController
 @RequestMapping(path = "/bankservice/transfer")
+@RequiredArgsConstructor
 public class TransferController {
 
     private final AuthService authService;
     private final TransferService transferService;
-
-    public TransferController(AuthService authService, TransferService transferService) {
-        this.authService = authService;
-        this.transferService = transferService;
-    }
 
     @Operation(summary = "Приветствие")
     @GetMapping()
