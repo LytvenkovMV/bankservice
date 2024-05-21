@@ -5,6 +5,7 @@ import com.example.bankservice.entity.Client;
 import com.example.bankservice.exception.ExSender;
 import com.example.bankservice.repository.ClientRepository;
 import jakarta.persistence.LockModeType;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.Lock;
@@ -15,16 +16,12 @@ import java.math.BigDecimal;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class TransferService {
 
+    @Value("${transfer-service.max-amount}")
+    private String maxAmountProp;
     private final ClientRepository clientRepository;
-    private final BigDecimal maxAmount;
-
-    public TransferService(ClientRepository clientRepository,
-                           @Value("${transfer-service.max-amount}") String maxAmount) {
-        this.clientRepository = clientRepository;
-        this.maxAmount = new BigDecimal(maxAmount);
-    }
 
     public String greeting(String username) {
         return "Приветствуем, " + username + "! Это сервис переводов.";
@@ -38,6 +35,7 @@ public class TransferService {
 
         String recipientUsername = transferRequestDto.getRecipientUsername();
         BigDecimal amount = new BigDecimal(transferRequestDto.getAmount());
+        BigDecimal maxAmount = new BigDecimal(maxAmountProp);
 
         if (senderUsername.equals(recipientUsername))
             ExSender.sendBadRequest("Логин отправителя и логин получателя совпадают");
@@ -53,7 +51,8 @@ public class TransferService {
         BigDecimal senderCurrBalance = sender.getCurrBalance();
         BigDecimal recipientCurrBalance = recipient.getCurrBalance();
 
-        if (amount.compareTo(senderCurrBalance) > 0) ExSender.sendBadRequest("У отправителя недостаточно средств для перевода");
+        if (amount.compareTo(senderCurrBalance) > 0)
+            ExSender.sendBadRequest("У отправителя недостаточно средств для перевода");
 
         sender.setCurrBalance(senderCurrBalance.subtract(amount));
         recipient.setCurrBalance(recipientCurrBalance.add(amount));

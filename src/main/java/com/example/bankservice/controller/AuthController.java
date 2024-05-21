@@ -4,19 +4,17 @@ import com.example.bankservice.dto.JwtResponseDto;
 import com.example.bankservice.dto.LoginRequestDto;
 import com.example.bankservice.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/bankservice/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     @Operation(summary = "Приветствие")
     @GetMapping()
