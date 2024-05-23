@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="create_function_get_new_balance" author="vitek">
+        <createProcedure catalogName="cat"
+                         dbms="postgresql"
+                         encoding="UTF-8"
+                         path="functions/calc-new-balance.sql"
+                         relativeToChangelogFile="true"
+                         schemaName="public">
+        </createProcedure>
+    </changeSet>
+    <changeSet id="create_function_charge_balance" author="vitek">
+        <createProcedure catalogName="cat"
+                         dbms="postgresql"
+                         encoding="UTF-8"
+                         path="functions/charge-balance.sql"
+                         relativeToChangelogFile="true"
+                         schemaName="public">
+        </createProcedure>
+    </changeSet>
+</databaseChangeLog>

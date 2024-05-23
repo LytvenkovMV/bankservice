@@ -7,4 +7,5 @@
     <include file="create-changeset-phones-table.xml" relativeToChangelogFile="true"/>
     <include file="create-changeset-emails-table.xml" relativeToChangelogFile="true"/>
     <include file="create-changeset-roles-table.xml" relativeToChangelogFile="true"/>
+    <include file="create-changeset-stored-func.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

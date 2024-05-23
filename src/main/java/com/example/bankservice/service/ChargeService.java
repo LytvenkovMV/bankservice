@@ -26,7 +26,7 @@ public class ChargeService {
 
     @Transactional
     @Scheduled(initialDelayString = delay, fixedRateString = delay)
-    public void increaseBalance() {
+    public void chargeBalance() {
 
         List<Client> clients = clientRepository.findAll();
         for (Client client : clients) {
